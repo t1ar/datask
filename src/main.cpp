@@ -2,80 +2,111 @@
 #include "backend/list.hpp"
 #include "backend/hash_table.hpp"
 #include "backend/stack.hpp"
+#include "backend/queue.hpp"
+#include "backend/bst.hpp"
+#include "backend/graph.hpp"
 #include <iostream>
 
 int main() {
-    //1.  init
-    ListNode* mainTaskList = nullptr;
-    
-    // Create our Hash Table array of size 11 and initialize all buckets to nullptr
-    HashNode* myHashTable[11] = {nullptr};
-    
-    // Create our empty Undo Stack tracker
-    StackNode* undoStackTop = nullptr;
+    std::cout << "=== TASKFLOW ULTIMATE SYSTEM TEST ===\n\n";
 
-    std::cout << "--- TASKFLOW BACKEND VERIFICATION ---\n";
+    // 1. ALLOCATE TASKS
+    Task* t1 = new Task{"TSK1", "Design Database", 3, 20260601};
+    Task* t2 = new Task{"TSK2", "Write Backend API", 2, 20260610};
+    Task* t3 = new Task{"TSK3", "Deploy to Server", 1, 20260620}; // Absolute highest priority!
+    Task* t4 = new Task{"TSK4", "Build User Interface", 4, 20260615};
 
-    //2. test create tasks
-    Task* t1 = new Task{"TSK01", "Design Database Architecture", 1, 20260520};
-    Task* t2 = new Task{"TSK02", "Write FTXUI Layout Code", 2, 20260525};
+    // ---------------------------------------------------------
+    // TEST 1: THE GRAPH ENGINE 
+    // ---------------------------------------------------------
+    std::cout << "[GRAPH] Building Dependency Chain...\n";
+    GraphNode* gn1 = new GraphNode{t1, nullptr};
+    GraphNode* gn2 = new GraphNode{t2, nullptr};
+    GraphNode* gn3 = new GraphNode{t3, nullptr};
+    GraphNode* gn4 = new GraphNode{t4, nullptr};
 
-    insertTask(mainTaskList,t1);
-    insertTask(mainTaskList,t2);
+    // Rule 1: Dont talk about fight club (Database must be done before API and UI)
+    addDependency(gn1, gn2);
+    addDependency(gn1, gn4);
+    // Rule 2: You do not talk about fight club (API must be done before Deployment)
+    addDependency(gn2, gn3);
 
-    insertToTable(myHashTable,t1);
-    insertToTable(myHashTable,t2);
+    std::cout << "What happens if we start 'Design Database'?\n";
+    printDependenciesChain(gn1, 0);
+    std::cout << "\n";
 
-    std::cout << "Tasks successfully generated and indexed!\n";
+    // ---------------------------------------------------------
+    // TEST 2: THE BINARY SEARCH TREE 
+    // ---------------------------------------------------------
+    std::cout << "[BST] Inserting tasks into Priority Tree...\n";
+    BSTNode* priorityRoot = nullptr;
+    priorityRoot = insertPriority(priorityRoot, t1);
+    priorityRoot = insertPriority(priorityRoot, t2);
+    priorityRoot = insertPriority(priorityRoot, t3);
+    priorityRoot = insertPriority(priorityRoot, t4);
 
-    //3. test lookup
-    std::cout << "\nTesting Hash Table Search for ID 'TSK02'...\n";
-    
-    Task* found = lookupInTable(myHashTable,"TSK02");
+    Task* mostUrgent = pullHighestPriority(priorityRoot);
+    std::cout << "Most Urgent Task: " << mostUrgent->title 
+              << " (Priority Level " << mostUrgent->priority << ")\n\n";
 
-    if (found != nullptr) {
-        std::cout << "Success! Found Task: " << found->title << "\n";
-    } else {
-        std::cout << "Error: Task not found in Hash Table.\n";
+    // ---------------------------------------------------------
+    // TEST 3: MERGE SORT 
+    // ---------------------------------------------------------
+    std::cout << "[MERGE SORT] Sorting main list by Deadline...\n";
+    ListNode* mainList = nullptr;
+    // Inserting them totally out of order!
+    insertTask(mainList, t3); 
+    insertTask(mainList, t1); 
+    insertTask(mainList, t4); 
+    insertTask(mainList, t2); 
+
+    // The O(n log n) magic:
+    mainList = mergeSort(mainList);
+
+    ListNode* curr = mainList;
+    while (curr) {
+        std::cout << "Deadline: " << curr->taskPtr->deadline 
+                  << " -> " << curr->taskPtr->title << "\n";
+        curr = curr->next;
     }
 
-    //4. test delete and undo
-    std::cout << "\nSimulating deletion of 'TSK01' and pushing to Undo Stack...\n";
-    
-    // For this raw test, we will bypass the list deletion logic and just 
-    // simulate pushing t1 to the stack and retrieving it.
-    
-    // ACTION: Push t1 to your undoStackTop
-    push(undoStackTop,t1);
-    
-    std::cout << "Task pushed to Stack. Triggering manual Undo (Pop)...\n";
-
-    // ACTION: Pop the task back out from undoStackTop and store it in a Task* variable called 'restored'
-    Task* restored = pop(undoStackTop);
-
-    if (restored != nullptr) {
-        std::cout << "Undo successful! Restored Task: " << restored->title << "\n";
+    // ---------------------------------------------------------
+    // TEST 4: HASH TABLE SEARCH 
+    // ---------------------------------------------------------
+    std::cout << "[HASH TABLE] Testing O(1) ID Lookup...\n";
+    HashNode* directory[10] = {nullptr};
+    insertToTable(directory,t1);
+    insertToTable(directory,t2);
+    insertToTable(directory,t3);
+    insertToTable(directory,t4);
+    Task* foundTask = lookupInTable(directory,"TSK2");
+    if (foundTask) {
+        std::cout << "Found It! " << foundTask->title;
     }
+    
+    // ---------------------------------------------------------
+    // TEST 5: STACK 
+    // ---------------------------------------------------------
+    std::cout << "\n[STACK] Testing LIFO Undo Engine...\n";
+    StackNode* undoStack = nullptr;
+    push(undoStack,t1);
+    push(undoStack,t2);
 
-    // Clean list nodes and tasks
-    ListNode* current = mainTaskList;
-    while (current != nullptr) {
-        ListNode* nextNode = current->next;
-        delete current->taskPtr; // Free actual Task data
-        delete current;          // Free ListNode wrapper
-        current = nextNode;
-    }
+    Task* savedTask = pop(undoStack);
 
-    // Clean Hash Table wrapper nodes (The tasks themselves are already freed above)
-    for (int i = 0; i < 11; i++) {
-        HashNode* currHash = myHashTable[i];
-        while (currHash != nullptr) {
-            HashNode* nextHash = currHash->next;
-            delete currHash; // Free HashNode wrapper only
-            currHash = nextHash;
-        }
-    }
+    std::cout << "Ooppsie! CTRL+Z! " << savedTask->title;
+    
+    // ---------------------------------------------------------
+    // TEST 6: QUEUE
+    // ---------------------------------------------------------
+    std::cout << "\n[QUEUE] Testing FIFO Focus Mode...\n";
+    TaskQueue dailyQueue;
+    enqueue(dailyQueue,t2);
+    enqueue(dailyQueue,t3);
 
-    std::cout << "\nMemory gracefully swept clean. Systems baseline green!\n";
+    Task* daDequeued = dequeue(dailyQueue);
+    std::cout << "Push that mf out! " << daDequeued->title;
+
+    std::cout << "\nALL ENGINES GREEN. ARCHITECTURE VERIFIED!\n";
     return 0;
 }

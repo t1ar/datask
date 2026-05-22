@@ -69,4 +69,15 @@ inline ListNode* mergeLists(ListNode* a, ListNode* b){
     
     return realHead;
 
-}
+};
+
+inline ListNode* mergeSort(ListNode* head){
+    if (!head || head->next == nullptr){
+        return head;
+    }
+    ListNode* secondHalf = splitList(head);
+    head = mergeSort(head);
+    secondHalf = mergeSort(secondHalf);
+
+    return mergeLists(head,secondHalf);
+};
