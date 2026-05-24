@@ -7,6 +7,7 @@ struct Task {
     int priority;
     int deadline;
     bool completed;
+    std::string rawDependencies = "";
 };
 
 //doubly link, need it to go both ways

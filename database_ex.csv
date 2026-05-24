@@ -1,0 +1,30 @@
+TSK1,Write Game Design Document,1,20260701,1,
+TSK2,Concept Art Characters,2,20260705,1,TSK1
+TSK3,Concept Art Environments,2,20260705,1,TSK1
+TSK4,Draft Story Outline,3,20260710,0,TSK1
+TSK5,Finalize Tech Stack,1,20260702,1,TSK1
+TSK6,Setup Git Repository,1,20260703,1,TSK5
+TSK7,Game Loop Architecture,1,20260715,0,TSK6
+TSK8,Input Handling Engine,2,20260718,0,TSK7
+TSK9,2D Rendering Pipeline,1,20260720,0,TSK7
+TSK10,Physics and Collision Base,1,20260725,0,TSK7
+TSK11,Audio Manager Architecture,3,20260728,0,TSK7
+TSK12,UI Overlay System,2,20260801,0,TSK7
+TSK13,Core Player Movement,1,20260805,0,TSK8;TSK10
+TSK14,Player Animation Controller,2,20260810,0,TSK2;TSK9;TSK13
+TSK15,Inventory System UI,2,20260815,0,TSK12
+TSK16,Item Data Structures,2,20260812,0,
+TSK17,Equip Items Logic,2,20260820,0,TSK15;TSK16
+TSK18,Enemy AI Base State Machine,1,20260825,0,TSK10;TSK13
+TSK19,Pathfinding A-Star Grid,1,20260830,0,TSK18
+TSK20,Combat Damage Calculation,1,20260905,0,TSK13;TSK18
+TSK21,Tilemap JSON Loader,2,20260910,0,TSK9
+TSK22,Level 1 World Design,2,20260915,0,TSK3;TSK21
+TSK23,Level 1 Boss Fight Mechanics,1,20260920,0,TSK14;TSK19;TSK20
+TSK24,Combat Sound Effects,3,20260925,0,TSK11;TSK13;TSK20
+TSK25,Background Music Implementation,3,20260925,0,TSK11
+TSK26,Save and Load Data System,1,20261001,0,TSK15;TSK16
+TSK27,Main Menu User Interface,2,20261005,0,TSK12
+TSK28,Closed Beta Testing,1,20261015,0,TSK22;TSK23;TSK26;TSK27
+TSK29,Bug Fixes and Polishing,1,20261025,0,TSK28
+TSK30,Final Master Release Build,1,20261101,0,TSK24;TSK25;TSK29
