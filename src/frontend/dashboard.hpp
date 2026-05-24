@@ -692,6 +692,12 @@ inline void launchDashboard(ListNode* mainList){
         std::cout << "   FINAL TASK DEPENDENCY GRAPH     \n";
         std::cout << "===================================\n";
         printDependenciesChain(graphArray[0], 0);
+        for (int i = 0; i < graphSize; i++) {
+            if (graphArray[i] != nullptr && graphArray[i]->outgoingEdge != nullptr) {
+                printDependenciesChain(graphArray[i], 0);
+                std::cout << "-----------------------------------\n";
+            }
+        }
         std::cout << "\n";
     }
     
